@@ -1,0 +1,25 @@
+{
+  "name": "thul/scoresheet-domain",
+  "description": "Scoresheet domain",
+  "minimum-stability": "dev",
+  "license": "proprietary",
+  "authors": [
+    {
+      "name": "Thul",
+      "email": "thul@arienai.com"
+    }
+  ],
+  "require": {
+    "broadway/broadway": "0.5.*",
+    "beberlei/assert": "~2.3"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "~4.6",
+    "mockery/mockery": "~0.9.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "Thul\\Scoresheet\\": "src/"
+    }
+  }
+}
