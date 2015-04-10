@@ -26,11 +26,29 @@ class Scoresheet extends EventSourcedAggregateRoot
 
         try {
             Assertion::uuid($scoresheetId);
+
             Assertion::string($location);
+            Assertion::notEmpty($location);
+
             Assertion::string($home);
+            Assertion::notEmpty($home);
+
             Assertion::string($away);
+            Assertion::notEmpty($away);
+
         } catch (\InvalidArgumentException $e) {
-            die(':(');
+            $scoresheet->apply(
+                new MatchFailedToStart(
+                    $scoresheetId,
+                    $date,
+                    $location,
+                    $home,
+                    $away,
+                    $e->getMessage()
+                )
+            );
+
+            return $scoresheet;
         }
 
         $scoresheet->apply(

@@ -25,10 +25,19 @@ class ScoresheetTest extends AggregateRootScenarioTestCase
         return (new Version4Generator)->generate();
     }
 
+    private function date()
+    {
+        $date =  \DateTimeImmutable::createFromFormat('Y-m-d H:i:s', date('Y-m-d H:i:s'));
+        return $date->format('Y-m-d H:i:s');
+    }
+
+    /**
+     *
+     */
     public function testMatchStarted()
     {
         $scoresheetId = $this->uuid();
-        $date = \DateTimeImmutable::createFromFormat('y-m-d h:i:s', time());
+        $date = $this->date();
         $location = 'Somewhere on planet earth';
         $home = 'team 1';
         $away = 'team 2';
@@ -51,6 +60,96 @@ class ScoresheetTest extends AggregateRootScenarioTestCase
                    $home,
                    $away
                )
+            ]);
+    }
+
+    public function testMatchedStartFailedMissingTeam()
+    {
+        $scoresheetId = $this->uuid();
+        $date = $this->date();
+        $location = 'Somewhere on planet earth';
+        $home = 'team 1';
+        $away = '';
+
+        $this->scenario
+            ->when(function() use ($scoresheetId, $date, $location, $home, $away) {
+                return Scoresheet::startMatch(
+                    $scoresheetId,
+                    $date,
+                    $location,
+                    $home,
+                    $away
+                );
+            })
+            ->then([
+                new MatchFailedToStart(
+                    $scoresheetId,
+                    $date,
+                    $location,
+                    $home,
+                    $away,
+                    'Value "" is empty, but non empty value was expected.'
+                )
+            ]);
+    }
+
+    public function testMatchedStartFailedMissingLocation()
+    {
+        $scoresheetId = $this->uuid();
+        $date = $this->date();
+        $location = '';
+        $home = 'team 1';
+        $away = 'team 2';
+
+        $this->scenario
+            ->when(function() use ($scoresheetId, $date, $location, $home, $away) {
+                return Scoresheet::startMatch(
+                    $scoresheetId,
+                    $date,
+                    $location,
+                    $home,
+                    $away
+                );
+            })
+            ->then([
+                new MatchFailedToStart(
+                    $scoresheetId,
+                    $date,
+                    $location,
+                    $home,
+                    $away,
+                    'Value "" is empty, but non empty value was expected.'
+                )
+            ]);
+    }
+
+    public function testMatchedStartFailedMissinUuid()
+    {
+        $scoresheetId = '';
+        $date = $this->date();
+        $location = 'Somewhere on earth';
+        $home = 'team 1';
+        $away = 'team 2';
+
+        $this->scenario
+            ->when(function() use ($scoresheetId, $date, $location, $home, $away) {
+                return Scoresheet::startMatch(
+                    $scoresheetId,
+                    $date,
+                    $location,
+                    $home,
+                    $away
+                );
+            })
+            ->then([
+                new MatchFailedToStart(
+                    $scoresheetId,
+                    $date,
+                    $location,
+                    $home,
+                    $away,
+                    'Value "" is not a valid UUID.'
+                )
             ]);
     }
 
