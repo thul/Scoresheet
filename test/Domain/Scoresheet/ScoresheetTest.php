@@ -153,4 +153,71 @@ class ScoresheetTest extends AggregateRootScenarioTestCase
             ]);
     }
 
+    public function testMatchEnded()
+    {
+        $scoresheetId = $this->uuid();
+        $date = $this->date();
+        $location = 'Somewhere on earth';
+        $home = 'team 1';
+        $away = 'team 2';
+
+        $this->scenario
+            ->withAggregateId($scoresheetId)
+            ->given(array(
+                new MatchStarted(
+                    $scoresheetId,
+                    $date,
+                    $location,
+                    $home,
+                    $away
+                )
+            ))
+            ->when(function ($scoresheet) use ($scoresheetId, $date) {
+                return $scoresheet->stopMatch(
+                    $scoresheetId,
+                    $date
+                );
+            })
+            ->then([
+                new MatchEnded(
+                    $scoresheetId,
+                    $date
+                )
+            ]);
+    }
+
+    public function testMatchFailedToEndedDueToMissingUuid()
+    {
+        $scoresheetId = '';
+        $date = $this->date();
+        $location = 'Somewhere on earth';
+        $home = 'team 1';
+        $away = 'team 2';
+
+        $this->scenario
+            ->withAggregateId($scoresheetId)
+            ->given(array(
+                new MatchStarted(
+                    $scoresheetId,
+                    $date,
+                    $location,
+                    $home,
+                    $away
+                )
+            ))
+            ->when(function ($scoresheet) use ($scoresheetId, $date) {
+                return $scoresheet->stopMatch(
+                    $scoresheetId,
+                    $date
+                );
+            })
+            ->then([
+                new MatchFailedToEnd(
+                    $scoresheetId,
+                    $date,
+                    'Value "" is not a valid UUID.'
+                )
+            ]);
+    }
+
 }
