@@ -220,4 +220,45 @@ class ScoresheetTest extends AggregateRootScenarioTestCase
             ]);
     }
 
+    public function testGoalScored()
+    {
+        $scoresheetId = $this->uuid();
+        $date = $this->date();
+
+
+        $this->scenario
+            ->withAggregateId($scoresheetId)
+            ->given(array(new MatchStarted(
+                    $scoresheetId,
+                    $date,
+                    'somewhere',
+                    'home',
+                    'away'
+                )
+            ))
+            ->when(function ($scoresheet) use ($scoresheetId){
+
+                /** @var \Thul\Scoresheet\Domain\Scoresheet\Scoresheet $scoresheet */
+                $scoresheet->addGoal(
+                    $scoresheetId,
+                    $team = 'some team',
+                    $goalScorer = '1',
+                    $primaryAssist = '2',
+                    $secondaryAssist = '3',
+                    $time = '0:13',
+                    $period = '1'
+                );
+            })
+            ->then(array(
+                new GoalScored(
+                    $scoresheetId,
+                    $team = 'some team',
+                    $goalScorer = '1',
+                    $primaryAssist = '2',
+                    $secondaryAssist = '3',
+                    $period = '1',
+                    $time = '0:13'
+                )
+            ));
+    }
 }

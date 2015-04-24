@@ -8,10 +8,14 @@ use Broadway\EventSourcing\EventSourcedAggregateRoot;
 class Scoresheet extends EventSourcedAggregateRoot
 {
     private $scoresheetId;
-
     private $date;
-
     private $reason;
+    private $team;
+    private $period;
+    private $goalScorer;
+    private $time;
+    private $primaryAssist;
+    private $secondaryAssist;
 
     /**
      * @return string
@@ -96,8 +100,30 @@ class Scoresheet extends EventSourcedAggregateRoot
                 $date
             )
         );
+    }
 
+    public function addGoal($scoresheetId, $team, $goalScorer, $primaryAssist, $secondaryAssist, $time, $period)
+    {
+        try {
+            Assertion::string($team);
+            Assertion::integerish($goalScorer);
+            Assertion::integerish($primaryAssist);
+            Assertion::integerish($secondaryAssist);
+            Assertion::integerish($period);
+            // Time assertion?
+        } catch (\InvalidArgumentException $e) {
+            // TODO implement failure
+        }
 
+        $this->apply(new GoalScored(
+            $scoresheetId,
+            $team,
+            $goalScorer,
+            $primaryAssist,
+            $secondaryAssist,
+            $period,
+            $time
+        ));
     }
 
     /**
@@ -135,5 +161,16 @@ class Scoresheet extends EventSourcedAggregateRoot
     {
         $this->scoresheetId = $event->scoresheetId();
         $this->reason = $event->reason();
+    }
+
+    protected function applyGoalScored(GoalScored $event)
+    {
+        $this->scoresheetId = $event->scoresheetId();
+        $this->team = $event->team();
+        $this->period = $event->period();
+        $this->time = $event->time();
+        $this->goalScorer = $event->goalScorer();
+        $this->primaryAssist = $event->primaryAssist();
+        $this->secondaryAssist = $event->secondaryAssist();
     }
 }

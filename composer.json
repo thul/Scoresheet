@@ -1,7 +1,6 @@
 {
   "name": "thul/scoresheet-domain",
   "description": "Scoresheet domain",
-  "minimum-stability": "dev",
   "license": "proprietary",
   "authors": [
     {
