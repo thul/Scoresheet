@@ -9,7 +9,7 @@
     }
   ],
   "require": {
-    "broadway/broadway": "0.5.*",
+    "broadway/broadway": "~0.5",
     "beberlei/assert": "~2.3"
   },
   "require-dev": {

@@ -16,6 +16,9 @@ class Scoresheet extends EventSourcedAggregateRoot
     private $time;
     private $primaryAssist;
     private $secondaryAssist;
+    private $penalty;
+    private $penaltyTime;
+    private $player;
 
     /**
      * @return string
@@ -126,6 +129,19 @@ class Scoresheet extends EventSourcedAggregateRoot
         ));
     }
 
+    public function addPenalty($scoresheetId, $team, $player, $penalty, $time, $period, $penaltyTime)
+    {
+        $this->apply(new PenaltyAdded(
+            $scoresheetId,
+            $team,
+            $player,
+            $penalty,
+            $time,
+            $period,
+            $penaltyTime
+        ));
+    }
+
     /**
      * @param \Thul\Scoresheet\Domain\Scoresheet\MatchStarted $event
      */
@@ -172,5 +188,16 @@ class Scoresheet extends EventSourcedAggregateRoot
         $this->goalScorer = $event->goalScorer();
         $this->primaryAssist = $event->primaryAssist();
         $this->secondaryAssist = $event->secondaryAssist();
+    }
+
+    protected function applyPenaltyAdded(PenaltyAdded $event)
+    {
+        $this->scoresheetId = $event->scoresheetId();
+        $this->team = $event->team();
+        $this->period = $event->period();
+        $this->time = $event->time();
+        $this->penalty = $event->penalty();
+        $this->penaltyTime = $event->penaltyTime();
+        $this->player = $event->player();
     }
 }

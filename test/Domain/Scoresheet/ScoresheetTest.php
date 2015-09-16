@@ -225,7 +225,6 @@ class ScoresheetTest extends AggregateRootScenarioTestCase
         $scoresheetId = $this->uuid();
         $date = $this->date();
 
-
         $this->scenario
             ->withAggregateId($scoresheetId)
             ->given(array(new MatchStarted(
@@ -237,8 +236,6 @@ class ScoresheetTest extends AggregateRootScenarioTestCase
                 )
             ))
             ->when(function ($scoresheet) use ($scoresheetId){
-
-                /** @var \Thul\Scoresheet\Domain\Scoresheet\Scoresheet $scoresheet */
                 $scoresheet->addGoal(
                     $scoresheetId,
                     $team = 'some team',
@@ -261,4 +258,45 @@ class ScoresheetTest extends AggregateRootScenarioTestCase
                 )
             ));
     }
+
+    public function testPenaltyGiven()
+    {
+        $scoresheetId = $this->uuid();
+        $date = $this->date();
+
+        $this->scenario
+            ->withAggregateId($scoresheetId)
+            ->given([
+                new MatchStarted(
+                    $scoresheetId,
+                    $date,
+                    'somewhere',
+                    'home',
+                    'away'
+                )
+            ])
+            ->when(function ($scoresheet) use ($scoresheetId) {
+                $scoresheet->addPenalty(
+                    $scoresheetId,
+                    $team = 'some team',
+                    $player = '1',
+                    $call = 'roughing',
+                    $time = '5:00',
+                    $period = '1',
+                    $penaltyTime = '2:00'
+                );
+            })
+            ->then([
+                new PenaltyAdded(
+                    $scoresheetId,
+                    $team = 'some team',
+                    $player = '1',
+                    $penalty = 'roughing',
+                    $time = '5:00',
+                    $period = '1',
+                    $penaltyTime = '2:00'
+                )
+            ]);
+    }
+
 }
